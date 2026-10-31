@@ -1,37 +1,46 @@
 # ai-common
 
-Private, tool-agnostic AI setup that I reuse across projects. It holds the parts that
-should not be rewritten per repo: a rules-and-skills layout for Claude Code, the
-guard hooks that stop an agent from doing harm, and the templates a new project starts from.
+Private, tool-agnostic AI setup that I reuse across projects, distributed with
+[APM](https://github.com/microsoft/apm) (Agent Package Manager). It holds what should not be
+rewritten in every repo: the workflow skills, a review agent, the guard hooks that stop an
+agent from doing harm, and the templates a new project starts from.
 
 Only the owner uses it. It is private on purpose.
 
-## What is in here
+## Packages
 
-| Path | What it is | Status |
-|------|-----------|--------|
-| `claude-code/hooks/` | PreToolUse/PostToolUse guard hooks, copied from `dev-config` (see `docs/HOOKS.md`) | Copied; not re-tested here |
-| `claude-code/settings/` | `hooks.json`, `deny.json`, `statusline.json` the installer merges into `~/.claude/settings.json` | Copied |
-| `claude-code/statusline.sh` | Status line | Copied |
-| `templates/CLAUDE.md` | Router-style project `CLAUDE.md` (short, with a "working on X → read Y" table) | Draft |
-| `templates/settings.project.json` | Project `.claude/settings.json` with `permissions.ask` for state-changing git/gh commands (format hook still to add, lineup#158) | Draft, untested |
-| `templates/rules/` | Path-scoped rules example | Example |
-| `templates/context/` | On-demand context example (PR checklist) | Example |
-| `skills/` | Reusable skills; start with `new-issue` | One skill, copied from `lineup` |
-| `agents/` | Project agents; `convention-reviewer` is a read-only starting point | Draft |
-| `.apm/` | Local APM primitives (instructions, skills, agents) | Draft, not yet compiled |
-| `apm.yml` | APM manifest | Draft |
-| `docs/` | How to use it, step by step | See below |
+| Package | Scope | What it installs | Install |
+|---------|-------|------------------|---------|
+| [`packages/workflow`](packages/workflow) | per project | Skills: `new-issue`, `create-pr`, `triage-dependabot`, `update-documentation`, `repo-audit`, `setup-project`. Agent: `convention-reviewer`. | In the project's `apm.yml` (see [docs/USING.md](docs/USING.md)) |
+| [`packages/guards`](packages/guards) | per machine (user) | Claude Code hooks: ask before commits/pushes, deletes, secret reads, network uploads and writes outside the workspace; audit log; backups; syntax check after edits. | `apm install -g LasterBergamot/ai-common/packages/guards#<tag>` |
+
+The workflow skills are **generic**: each one reads the project's values (repo, labels,
+milestones, gates, doc map) from a context file in the project, for example
+`.claude/context/issues.md`. The skill holds the procedure, the project holds the facts.
+Templates for those files are in [`templates/context/`](templates/context).
+
+## Other folders
+
+| Path | What it is |
+|------|------------|
+| `templates/CLAUDE.md` | Router-style `CLAUDE.md` for a new project |
+| `templates/settings.project.json` | Project `.claude/settings.json` with `permissions.ask` for state-changing git/gh commands |
+| `templates/context/` | The context files the workflow skills read |
+| `templates/rules/` | An example path-scoped rule |
+| `docs/` | How to use, change and release all of this |
 
 ## Docs
 
-- [Using it in a new project](docs/USING.md): the step-by-step guide.
-- [Hooks](docs/HOOKS.md): what each guard does, how to change it, how to test it.
-- [Claude Code hooks, in depth](docs/claude-code-hooks.md): copied from `dev-config`.
-- [APM evaluation](docs/APM.md): what is decided and what is still open (#157 in `lineup`).
+- [Using it in a project](docs/USING.md): step by step, for a new or an existing project.
+- [Changing and releasing](docs/AUTHORING.md): edit a skill, bump the version, tag, update projects.
+- [Hooks](docs/HOOKS.md) and the [guards package README](packages/guards/README.md) (internals).
+- [APM decisions](docs/APM.md): what was decided and why, and the known limits.
 
 ## Status
 
-This is a first scaffold. Nothing here has been installed and run end to end yet. The APM
-manifest has not been checked with the `apm` CLI, which is not installed on this machine.
-Treat every "Draft" row above as unverified until it is run.
+- `packages/workflow` is installed in `lineup` and its skills are the ones lineup uses.
+- `packages/guards` was installed and exercised under a throw-away `HOME`, not yet on a real
+  machine: switching the machine from `dev-config`'s copy of the hooks is step 1 of
+  `docs/USING.md`.
+- Only the `claude` target is enabled. Other agents (Copilot, Cursor, Codex…) can be added as
+  targets; see `docs/APM.md` for what carries over.

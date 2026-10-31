@@ -1,0 +1,8 @@
+name: workflow
+version: 0.1.0
+description: Reusable skills (issues, PRs, Dependabot, docs, audits, setup) and a convention-reviewer agent.
+targets:
+  - claude
+dependencies:
+  apm: []
+  mcp: []

@@ -1,0 +1,48 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell|Write|Edit|NotebookEdit|Read|Artifact|ArtifactData|CronDelete|TaskStop|mcp__.*",
+        "hooks": [
+          { "type": "command", "command": "bash ${PLUGIN_ROOT}/scripts/pretool.sh", "timeout": 10, "onFailure": "block" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          { "type": "command", "command": "bash ${PLUGIN_ROOT}/scripts/posttool-check.sh", "timeout": 15 }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash ${PLUGIN_ROOT}/scripts/prompt-check.sh", "timeout": 5 }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash ${PLUGIN_ROOT}/scripts/session-start.sh", "timeout": 10 }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash ${PLUGIN_ROOT}/scripts/notify.sh", "timeout": 5 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash ${PLUGIN_ROOT}/scripts/notify.sh", "timeout": 5 }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+name: guards
+version: 0.1.0
+description: Claude Code guard hooks (ask before risky git, delete, secret, network and out-of-workspace actions).
+targets:
+  - claude
+dependencies:
+  apm: []
+  mcp: []
