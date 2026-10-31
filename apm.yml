@@ -1,0 +1,6 @@
+# DRAFT: not yet validated with the apm CLI (see docs/APM.md).
+name: ai-common
+version: 0.1.0
+description: Tool-agnostic AI setup (rules, skills, agents, hooks) for my projects.
+targets:
+  - claude

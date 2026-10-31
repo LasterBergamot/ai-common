@@ -1,0 +1,3 @@
+/claude-code/hooks/local.sh
+*.log
+.DS_Store
