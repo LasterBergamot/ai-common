@@ -1,6 +1,6 @@
 # Claude Code guard hooks
 
-Full install and settings snippet: `claude-code/README.md`. Source: `claude-code/hooks/`.
+Install: `docs/USING.md`, step 1 (`apm install -g`). Source: `packages/guards/scripts/`; the hook registration is `packages/guards/.apm/hooks/guards.json`. Installed copy: `~/.claude/hooks/guards/scripts/` (never edit it there).
 
 ## How it works
 
@@ -30,11 +30,11 @@ Guards only ever emit `ask`, never `deny`, so they prompt even in auto mode. `pe
 
 - Rules are arrays at the top of each guard file (for example `DELETE_ALWAYS`, `PROTECT_SERVICES`); protected paths are `HOOK_PROTECTED` in `lib.sh` and, per machine, in `local.sh`; credential patterns are `HOOK_CREDENTIAL_PATHS` and `HOOK_CREDENTIAL_TEXT`.
 - **The repo copy is not the live copy.** After editing, deploy: `Copy-Item claude-code\hooks\*.sh $HOME\.claude\hooks\ -Exclude test-hooks.sh`.
-- Test: `bash claude-code/hooks/test-hooks.sh` (sample payloads only; `VIA_DISPATCHER=1` routes through `pretool.sh`). Add a case for every new rule.
+- Test: `bash packages/guards/scripts/test-hooks.sh` (sample payloads only; `VIA_DISPATCHER=1` routes through `pretool.sh`). Add a case for every new rule.
 - Keep `.sh` files LF (`.gitattributes`).
-- Machine rules live in `~/.claude/hooks/local.sh` (template: `hooks/local.sh.example`). The tests load `hooks/test-fixtures/local.sh` instead, so they pass on any machine.
+- Machine rules live in `~/.claude/hooks/local.sh` (template: `scripts/local.sh.example`). The tests load `scripts/test-fixtures/local.sh` instead, so they pass on any machine.
 - Logs: `~/.claude/logs/audit-YYYYMMDD.jsonl`; backups: `~/.claude/backups/<date>/` (pruned after 14 days).
-- Update `claude-code/README.md` and the root `README.md` layout row when guard behaviour changes.
+- Update `docs/HOOKS.md` and the root `README.md` when guard behaviour changes, and bump `version` in `packages/guards/apm.yml`.
 
 ## Other hooks
 

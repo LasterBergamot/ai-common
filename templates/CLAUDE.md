@@ -12,11 +12,17 @@ table says so).
 
 | Working on | Read |
 |------------|------|
+| Setting up a dev machine | `documentation/Setup.md` (the `setup-project` skill follows it) |
 | <area> | `.claude/rules/<file>.md` |
 | Workflow, branches, merge rules | `.claude/context/workflow.md` |
-| Opening a PR | `.claude/context/pr-checklist.md` |
+| Filing or editing issues | `.claude/context/issues.md` |
+| Opening a PR, Dependabot | `.claude/context/pr-checklist.md` |
+| Docs and where they live | `.claude/context/docs.md` |
 
 ## Always-on rules
 
 - <Rules that apply to every change, for example "every change updates the README".>
-- State-changing git or gh commands need explicit confirmation (also enforced by `permissions.ask`).
+- State-changing git or gh commands need explicit confirmation (also enforced by
+  `permissions.ask` and the `ai-common` guard hooks).
+- The skills listed in `apm.yml`'s lock come from `ai-common`: change them there, not in
+  `.claude/skills/`, then bump the tag in `apm.yml` and run `apm install`.
