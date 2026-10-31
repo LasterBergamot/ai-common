@@ -39,8 +39,7 @@ Templates for those files are in [`templates/context/`](templates/context).
 ## Status
 
 - `packages/workflow` is installed in `lineup` and its skills are the ones lineup uses.
-- `packages/guards` was installed and exercised under a throw-away `HOME`, not yet on a real
-  machine: switching the machine from `dev-config`'s copy of the hooks is step 1 of
-  `docs/USING.md`.
-- Only the `claude` target is enabled. Other agents (Copilot, Cursor, Codex…) can be added as
-  targets; see `docs/APM.md` for what carries over.
+- `packages/guards` is installed at user scope on the Linux dev machine, replacing
+  `dev-config`'s copy of the hooks (`docs/USING.md` step 1). Its tests pass on Linux and in
+  Git Bash.
+- Claude Code is the only target, by decision (`docs/APM.md`, decision 6).

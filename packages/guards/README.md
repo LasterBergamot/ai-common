@@ -29,8 +29,9 @@ Guards only ever emit `ask`, never `deny`, so they prompt even in auto mode. `pe
 ## Editing the hooks
 
 - Rules are arrays at the top of each guard file (for example `DELETE_ALWAYS`, `PROTECT_SERVICES`); protected paths are `HOOK_PROTECTED` in `lib.sh` and, per machine, in `local.sh`; credential patterns are `HOOK_CREDENTIAL_PATHS` and `HOOK_CREDENTIAL_TEXT`.
-- **The repo copy is not the live copy.** After editing, deploy: `Copy-Item claude-code\hooks\*.sh $HOME\.claude\hooks\ -Exclude test-hooks.sh`.
-- Test: `bash packages/guards/scripts/test-hooks.sh` (sample payloads only; `VIA_DISPATCHER=1` routes through `pretool.sh`). Add a case for every new rule.
+- **The repo copy is not the live copy.** After editing, release a new tag and reinstall (`docs/HOOKS.md`).
+- **Paths are compared in lowercase** (`hook_norm_path` sets `NP`), which suits Windows. Anything that touches the file system (exists, size, read, copy) goes through `hook_real_path`, which sets `RP` to the real path; on Linux it matches each segment ignoring case. Never pass `NP` to a file test.
+- Test: `bash packages/guards/scripts/test-hooks.sh` (sample payloads only; `VIA_DISPATCHER=1` routes through `pretool.sh`). It tests the scripts next to it unless you pass a folder. Add a case for every new rule.
 - Keep `.sh` files LF (`.gitattributes`).
 - Machine rules live in `~/.claude/hooks/local.sh` (template: `scripts/local.sh.example`). The tests load `scripts/test-fixtures/local.sh` instead, so they pass on any machine.
 - Logs: `~/.claude/logs/audit-YYYYMMDD.jsonl`; backups: `~/.claude/backups/<date>/` (pruned after 14 days).

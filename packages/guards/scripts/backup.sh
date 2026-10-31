@@ -10,10 +10,10 @@ backup_file() {
   esac
   [[ -n $FILE ]] || return 0
   hook_norm_path "$FILE"
-  [[ -f $NP ]] || return 0
+  hook_real_path "$NP" && [[ -f $RP ]] || return 0
 
   local size day stamp name dir
-  size=$(stat -c %s "$NP" 2>/dev/null) || return 0
+  size=$(stat -c %s "$RP" 2>/dev/null) || return 0
   (( size < 5000000 )) || return 0
 
   printf -v day '%(%Y%m%d)T' -1
@@ -21,7 +21,7 @@ backup_file() {
   name=${FILE##*[\\/]}
   dir=$HOME/.claude/backups/$day
   mkdir -p "$dir" 2>/dev/null || return 0
-  cp -p -- "$NP" "$dir/$stamp-$name" 2>/dev/null || :
+  cp -p -- "$RP" "$dir/$stamp-$name" 2>/dev/null || :
 
   if (( RANDOM % 50 == 0 )); then
     find "$HOME/.claude/backups" -mindepth 1 -maxdepth 1 -mtime +14 -exec rm -rf {} + 2>/dev/null || :

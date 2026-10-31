@@ -25,10 +25,11 @@ hashes (drift) and scans for hidden Unicode in the deployed content.
 5. **Path-scoped rules stay in each project's `.claude/rules/`.** They are always
    project-specific. APM's `instructions` primitive (`applyTo` globs) would deploy to
    `.claude/rules/` for Claude, but nothing generic needs it yet.
-6. **Target: `claude` only for now.** The frontmatter that Claude Code reads (`model:`,
-   `effort:`, `tools:`) is copied as-is. For other targets, skills deploy to
-   `.agents/skills/` and work as plain instructions; Claude-only keys are ignored there.
-   The guard hooks parse Claude Code's hook payload, so they protect Claude Code only.
+6. **Target: `claude` only.** No second agent is planned (decided in #157 of lineup), so
+   the skills keep Claude Code's frontmatter (`model:`, `effort:`, `tools:`) and the hooks
+   parse Claude Code's payload. If that changes: other targets deploy skills to
+   `.agents/skills/` as plain instructions and ignore the Claude-only keys; the hooks would
+   need a payload adapter.
 7. **CI does not run `apm audit` yet**: it would need a token for this private repo. Run it
    locally before committing an update.
 
