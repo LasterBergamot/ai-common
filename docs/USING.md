@@ -11,8 +11,12 @@ Two separate installs: the **guards** once per machine, the **workflow** once pe
 
 ## 1. Install the guards on a machine (user scope)
 
+The guards don't depend on any project: they protect every Claude Code session on the
+machine, so install them on a machine you only use Claude on for general work too. That
+needs only step 0 and this step; the workflow (step 2 onwards) is for projects.
+
 ```bash
-apm install -g LasterBergamot/ai-common/packages/guards#v0.1.0 --target claude
+apm install -g LasterBergamot/ai-common/packages/guards#v0.1.1 --target claude
 ```
 
 What happens:

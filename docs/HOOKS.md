@@ -31,8 +31,8 @@ mode.
 ## Changing a rule
 
 1. Edit the script in `packages/guards/scripts/`.
-2. Run `bash packages/guards/scripts/test-hooks.sh` (15 Windows-path cases fail on Linux; see
-   `AUTHORING.md`).
+2. Run `bash packages/guards/scripts/test-hooks.sh`, and again with `VIA_DISPATCHER=1`. Both
+   must end with `failed: 0` on Linux and in Git Bash.
 3. Release (`AUTHORING.md`) and reinstall: `apm install -g LasterBergamot/ai-common/packages/guards#<new tag> --target claude`.
 
 ## Machine-specific values

@@ -34,9 +34,8 @@
    HOME=/tmp/fakehome apm install -g "$HOME/Work/repos/ai-common/packages/guards" --target claude
    ```
 
-   And run `bash packages/guards/scripts/test-hooks.sh`. On Linux, 15 Windows-path cases
-   fail; that is known (the suite was written for Git Bash) and not caused by a change unless
-   the count goes up.
+   And run `bash packages/guards/scripts/test-hooks.sh`, then the same with
+   `VIA_DISPATCHER=1`. Both must end with `failed: 0`, on Linux and in Git Bash.
 
 ## Release
 

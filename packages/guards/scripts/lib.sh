@@ -23,7 +23,8 @@ _hook_base() {
   NB=${NB//\\//}
   NB=${NB%/}
 }
-_hook_base "${TEMP:-}";             T_TEMP=$NB
+# Linux sets no TEMP, so $env:TEMP and %TEMP% fall back to TMPDIR or /tmp there.
+_hook_base "${TEMP:-${TMPDIR:-/tmp}}"; T_TEMP=$NB
 _hook_base "${TMP:-}";              T_TMP=$NB
 _hook_base "${LOCALAPPDATA:-}";     T_LAD=$NB
 _hook_base "${USERPROFILE:-$HOME}"; T_HOME=$NB
@@ -173,6 +174,34 @@ hook_norm_path() {
   if [[ $p == /* ]]; then NP="/${out[*]}"; else NP="${out[*]}"; fi
 }
 
+# NP -> RP: the existing file or folder that NP names. NP is lowercase, which finds the file on
+# Windows but not on a case-sensitive file system (Linux), so there each segment is matched against
+# its folder's entries, ignoring case. Returns 1 when nothing exists. Check files through RP, never NP.
+hook_real_path() {
+  RP=$1
+  [[ -e $RP ]] && return 0
+  [[ $1 == /?* ]] || return 1
+  local IFS=/ s e n cur= found
+  local -a seg
+  seg=(${1#/})
+  set +f
+  shopt -s nullglob dotglob
+  for s in "${seg[@]}"; do
+    found=
+    for e in "$cur"/*; do
+      n=${e##*/}
+      if [[ ${n,,} == "$s" ]]; then found=$e; break; fi
+    done
+    if [[ -z $found ]]; then cur=; break; fi
+    cur=$found
+  done
+  shopt -u nullglob dotglob
+  set -f
+  [[ -n $cur ]] || return 1
+  RP=$cur
+  return 0
+}
+
 # NP is inside the temp folders, including the session scratchpad. Git Bash sets TEMP to /tmp,
 # which is the same folder as %LOCALAPPDATA%\Temp, so the Windows locations are checked too.
 hook_is_temp() {
@@ -305,7 +334,7 @@ hook_overwrite_check() {
   for t in "${TARGETS[@]}"; do
     case $t in *'$'*|*'%'*|*'*'*|*'?'*|*'['*) hook_ask "$1: unresolved target $t" ;; esac
     hook_norm_path "$t"
-    if [[ -e $NP ]] && ! hook_is_temp "$NP"; then hook_ask "$1 would overwrite $t"; fi
+    if hook_real_path "$NP" && ! hook_is_temp "$NP"; then hook_ask "$1 would overwrite $t"; fi
   done
   return 0
 }

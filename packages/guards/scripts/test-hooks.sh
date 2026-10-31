@@ -4,16 +4,17 @@
 # temp files used are under /tmp (the session scratchpad area), and the repo paths only exist to
 # be checked, never written.
 #
-# Usage: bash test-hooks.sh [hooks-dir]     (defaults to ~/.claude/hooks)
+# Usage: bash test-hooks.sh [hooks-dir]     (defaults to the folder this script is in)
 
-HOOKS=${1:-$HOME/.claude/hooks}
+HOOKS=${1:-$(cd "$(dirname "$0")" && pwd)}
 
 # Machine-specific rules come from local.sh. The cases use a fixture and a fixed home folder, so they
 # pass on any machine. Run this from the repo: the fixture is not deployed.
 export HOOK_LOCAL="$(cd "$(dirname "$0")" && pwd)/test-fixtures/local.sh"
 export USERPROFILE='C:\Users\tester'
 # The workspace is this repo, so cases that overwrite an existing file find a real one (README.md).
-CWD_T=$(cd "$(dirname "$0")/../.." && pwd -W)
+# pwd -W gives the Windows form in Git Bash; other shells lack it and keep the plain path.
+CWD_T=$(cd "$(dirname "$0")/../../.." && { pwd -W 2>/dev/null || pwd; })
 PASS=0
 FAIL=0
 
@@ -25,6 +26,8 @@ printf '%s\n' 'import shutil' "shutil.rmtree('E:/Media')" >/tmp/hooktest/bad.py
 printf '%s\r\n' '@echo off' 'del /q C:\Work\Repos\example\README.md' >/tmp/hooktest/bad.bat
 printf '%s\n' 'Get-ChildItem' 'Remove-Item $env:TEMP\x.txt -Force' 'Write-Host "rm -rf is dangerous"' >/tmp/hooktest/ok.ps1
 printf '%s\n' 'print("hello")' >/tmp/hooktest/ok.py
+# Mixed case: on Linux the hooks must still find it although they compare paths in lowercase.
+mkdir -p /tmp/hooktest/Mixed && cp /tmp/hooktest/bad.ps1 /tmp/hooktest/Mixed/Bad2.ps1
 
 payload() {  # $1 = tool name, $2 = tool_input JSON. The cases name the workspace as C:\Work\Repos\example.
   jq -cn --arg t "$1" --arg cwd "$CWD_T" --arg ws "$CWD_T" --argjson i "$2" '
@@ -90,7 +93,7 @@ for c in \
   'ls -la' 'git status' 'git log --oneline' 'echo "rm is a command"' 'grep -r "rm -rf" .' \
   'rm -rf /tmp/hooktest/x' 'rm -rf "C:\Users\tester\AppData\Local\Temp\claude\x\scratchpad\a.txt"' \
   'Remove-Item $env:TEMP\x.txt' 'Remove-Item $env:TEMP\x.txt -Recurse -Force' \
-  'mv /tmp/hooktest/a /tmp/hooktest/b' 'git commit -m "rm stuff"' 'cp /tmp/hooktest/exists.txt /tmp/hooktest/copy.txt' \
+  'mv /tmp/hooktest/a /tmp/hooktest/b' 'git log --grep "rm stuff"' 'cp /tmp/hooktest/exists.txt /tmp/hooktest/copy.txt' \
   'cat README.md'
 do
   sh_case $G pass "$c" "keep: $c"
@@ -167,7 +170,7 @@ done
 for c in 'powershell -File /tmp/hooktest/bad.ps1' 'powershell -ExecutionPolicy Bypass -File /tmp/hooktest/bad.ps1' \
   '& /tmp/hooktest/bad.ps1' '. /tmp/hooktest/bad.ps1' 'python /tmp/hooktest/bad.py' 'py -3 /tmp/hooktest/bad.py' \
   'cmd /c /tmp/hooktest/bad.bat' 'Get-Date; /tmp/hooktest/bad.ps1' 'pwsh -Command /tmp/hooktest/bad.ps1' \
-  '& "$dir\x.ps1"'
+  '& "$dir\x.ps1"' 'powershell -File /tmp/hooktest/Mixed/Bad2.ps1'
 do
   ps_case $G ask "$c" "run script: $c"
 done

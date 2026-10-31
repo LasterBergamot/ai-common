@@ -139,10 +139,10 @@ _delete_run_scripts() {
   for r in "$@"; do
     case $r in *'$'*|*'%'*) hook_ask "runs a script whose path cannot be resolved: $r" ;; esac
     hook_norm_path "$r"
-    [[ -f $NP ]] || continue
-    size=$(stat -c %s "$NP")
+    hook_real_path "$NP" && [[ -f $RP ]] || continue
+    size=$(stat -c %s "$RP")
     if (( size > DELETE_SCRIPT_MAX )); then hook_ask "runs ${r##*/}, which is too large to check"; fi
-    content=$(<"$NP")
+    content=$(<"$RP")
     DELETE_CTX="running ${r##*/}: "
     _delete_text "$content" "$(_delete_mode "$r")"
   done

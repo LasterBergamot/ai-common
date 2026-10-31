@@ -5,19 +5,19 @@ source "${BASH_SOURCE[0]%"${BASH_SOURCE[0]##*/}"}lib.sh"
 hook_read_input || exit 0
 [[ -n $FILE ]] || exit 0
 hook_norm_path "$FILE"
-[[ -f $NP ]] || exit 0
+hook_real_path "$NP" &&[[ -f $RP ]] || exit 0
 
 problem=
 case ${NP,,} in
   *.sh)
-    problem=$(bash -n "$NP" 2>&1) ;;
+    problem=$(bash -n "$RP" 2>&1) ;;
   *.py)
     command -v python >/dev/null 2>&1 &&
-      problem=$(python -c 'import ast, sys; ast.parse(open(sys.argv[1], encoding="utf-8").read(), sys.argv[1])' "$NP" 2>&1) ;;
+      problem=$(python -c 'import ast, sys; ast.parse(open(sys.argv[1], encoding="utf-8").read(), sys.argv[1])' "$RP" 2>&1) ;;
   *.json)
-    problem=$("$HOOK_JQ" empty "$NP" 2>&1) ;;
+    problem=$("$HOOK_JQ" empty "$RP" 2>&1) ;;
   *.ps1)
-    problem=$(PS_FILE=$NP powershell.exe -NoProfile -Command '$t = $null; $e = $null; [void][System.Management.Automation.Language.Parser]::ParseFile($env:PS_FILE, [ref]$t, [ref]$e); $e | ForEach-Object { $_.Message }' 2>&1) ;;
+    problem=$(PS_FILE=$RP powershell.exe -NoProfile -Command '$t = $null; $e = $null; [void][System.Management.Automation.Language.Parser]::ParseFile($env:PS_FILE, [ref]$t, [ref]$e); $e | ForEach-Object { $_.Message }' 2>&1) ;;
 esac
 
 if [[ -n $problem ]]; then
