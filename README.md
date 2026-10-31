@@ -1,6 +1,6 @@
 # ai-common
 
-Private, tool-agnostic AI setup that I reuse across projects, distributed with
+Private Claude Code setup that I reuse across projects and machines, distributed with
 [APM](https://github.com/microsoft/apm) (Agent Package Manager). It holds what should not be
 rewritten in every repo: the workflow skills, a review agent, the guard hooks that stop an
 agent from doing harm, and the templates a new project starts from.
@@ -31,7 +31,8 @@ Templates for those files are in [`templates/context/`](templates/context).
 
 ## Docs
 
-- [Using it in a project](docs/USING.md): step by step, for a new or an existing project.
+- [Using it](docs/USING.md): step by step, for a machine (with `dev-config`, also for
+  general-purpose use without a project) and for a new or an existing project.
 - [Changing and releasing](docs/AUTHORING.md): edit a skill, bump the version, tag, update projects.
 - [Hooks](docs/HOOKS.md) and the [guards package README](packages/guards/README.md) (internals).
 - [APM decisions](docs/APM.md): what was decided and why, and the known limits.

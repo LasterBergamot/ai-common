@@ -5,15 +5,20 @@ Two separate installs: the **guards** once per machine, the **workflow** once pe
 ## 0. Prerequisites
 
 - APM CLI: `curl -sSL https://aka.ms/apm-unix | sh` (Linux/macOS), then `apm --version`.
-- Access to this private repo. APM uses your `gh` login (`gh auth login`), or a token in
-  `GITHUB_APM_PAT`. Check with `apm auth github.com --check`.
+- Access to this private repo. APM uses a token in `GITHUB_APM_PAT`, or your `gh` login if
+  it can read it. Check with `apm auth github.com --check`. If it reports "no credential found"
+  although `gh auth status` is fine (the token is in the system keyring), pass the `gh` token
+  for the one command: `GITHUB_APM_PAT=$(gh auth token) apm install …`. A failed auth shows up
+  as "all probes failed", which looks like a wrong path or tag.
 - `bash` and `jq` on `PATH` (the guard scripts need both; on Windows, Git Bash).
 
 ## 1. Install the guards on a machine (user scope)
 
 The guards don't depend on any project: they protect every Claude Code session on the
 machine, so install them on a machine you only use Claude on for general work too. That
-needs only step 0 and this step; the workflow (step 2 onwards) is for projects.
+needs only step 0 and this step; the workflow (step 2 onwards) is for projects. For the rest
+of the machine setup (status line, deny rules, git aliases), see
+[Machine setup with dev-config](#machine-setup-with-dev-config) below.
 
 ```bash
 apm install -g LasterBergamot/ai-common/packages/guards#v0.1.1 --target claude
@@ -29,12 +34,66 @@ Then:
 1. Copy `~/.claude/hooks/guards/scripts/local.sh.example` to `~/.claude/hooks/local.sh` and
    fill in this machine's protected folders and services. `local.sh` lives outside the package
    folder, so reinstalling never overwrites it.
-2. **If the machine already has `dev-config`'s hooks** (`~/.claude/hooks/pretool.sh` etc.):
-   remove their entries from `~/.claude/settings.json` (the ones that run
-   `bash ~/.claude/hooks/<name>.sh`), otherwise every guard runs twice. Keep `local.sh`.
-   `dev-config` still owns the status line, the `deny` rules and the git aliases.
+2. **If the machine has `dev-config`'s old copy of the hooks** (`~/.claude/hooks/pretool.sh`
+   etc.), every guard runs twice. Remove it with dev-config's installer:
+   `bash install.sh --only claude-old-hooks` (see below). It keeps `local.sh`.
 3. Start a new Claude Code session. `session-start.sh` lists the active guards. Ask Claude to
    run `git push`: it should ask first, even in auto mode.
+
+## Machine setup with dev-config
+
+Two of my repos set up a machine for Claude Code, and they don't overlap:
+
+| Repo | Installs | How |
+|------|----------|-----|
+| `dev-config` | Status line, `permissions.deny` rules for disk-wiping commands, the Antigravity CLI status line, git aliases | Its own installer, `bash install.sh` (`.\install.ps1` on Windows) |
+| `ai-common` | The guard hooks (`packages/guards`) | `apm install -g` (step 1) |
+| `ai-common` | Workflow skills and the review agent (`packages/workflow`) | Per project, only where you build something (step 2) |
+
+Both write to `~/.claude/settings.json`, each only its own keys: dev-config sets `statusLine`
+and adds to `permissions.deny`; APM adds hook entries whose commands run
+`~/.claude/hooks/guards/scripts/`. Either can run first, and re-running either keeps the
+other's entries.
+
+### A general-purpose machine
+
+For Claude Code without any project (questions, writing, scripts, admin work):
+
+1. Prerequisites: `bash`, `jq`, `git`, `gh` logged in, the APM CLI (step 0). On Windows, Git for
+   Windows provides `bash`.
+2. Clone `dev-config` and run its installer. Pick `claude-statusline`,
+   `claude-settings-statusline`, `claude-settings-deny` and, if you want them, `git-aliases`.
+3. Install the guards (step 1):
+   `GITHUB_APM_PAT=$(gh auth token) apm install -g LasterBergamot/ai-common/packages/guards#<tag> --target claude`.
+4. Create `~/.claude/hooks/local.sh` from `~/.claude/hooks/guards/scripts/local.sh.example`.
+   List this machine's folders that must never be written without asking (media libraries,
+   backup drives) and its services. Add a matching `Edit(//d/Media/**)`-style rule to
+   `permissions.deny` by hand: deny rules still hold when the hooks don't run.
+5. Start a new session. The session-start message lists the active guards, and the status line
+   shows. Ask Claude to run `git push` in any repo: it must ask first.
+
+Skip `packages/workflow` and the project steps: they only matter inside a project repo. The
+guards work the same with or without a project. `guard-workspace.sh` treats Claude's working
+directory as the workspace, git repo or not, and asks before any write elsewhere (temp and
+`~/.claude` excepted). So start Claude in the folder you want it to write to, for example a
+`~/scratch` folder, not your home folder.
+
+### Moving a machine off dev-config's old hooks
+
+dev-config used to copy the hooks straight into `~/.claude/hooks/`. On such a machine:
+
+1. Update `dev-config` (`git pull`) and run `bash install.sh --only claude-old-hooks`. It removes
+   the old entries from `settings.json` first and then moves the scripts to
+   `~/.claude/dev-config-backups/<timestamp>/old-hooks/`. That order matters: `pretool.sh` is
+   registered with `onFailure: "block"`, so a registered but missing script would block every
+   tool call. `local.sh` stays.
+2. Install the guards from here (step 1).
+
+### Updating
+
+- dev-config: `git pull`, then `bash install.sh`. The menu preselects what changed.
+- Guards: install the new tag with `apm install -g …#<new tag> --target claude`. The scripts
+  are replaced and `local.sh` is kept.
 
 ## 2. Add the workflow to a project (project scope)
 
