@@ -3,6 +3,7 @@
 ## Where things live
 
 - Workflow skills: `packages/workflow/.apm/skills/<name>/SKILL.md`
+- Learning skills: `packages/learning/.apm/skills/<name>/SKILL.md`; its agent: `packages/learning/.apm/agents/socratic-reviewer.agent.md`
 - Agents: `packages/workflow/.apm/agents/<name>.agent.md`
 - Guard scripts: `packages/guards/scripts/`; their registration: `packages/guards/.apm/hooks/guards.json`
 
@@ -15,6 +16,21 @@
 - Keep `model:` (and `effort:` where it matters) in the frontmatter. APM copies the file
   byte-for-byte, so Claude Code reads them as before.
 - State-changing git/gh steps always ask first.
+
+## Extra rules for the learning package
+
+- **Every skill and every agent declares both `model:` and `effort:`.** Here they are not
+  optional: tutoring quality depends on them, and the package README lists them. Change the
+  README table when you change a value.
+- Claude Code honours `effort:` in skill frontmatter. For agents, `effort:` is declared too,
+  but if a Claude Code version ignores it there, the agent runs at the session's effort.
+  `model:` still applies. Check the Claude Code subagent docs when you upgrade.
+- **No-code rule:** every primitive says that it never writes lab code, Dockerfiles, compose
+  files, manifests, IaC, scripts or configs, and writes Markdown only. A change must not weaken
+  that.
+- Project facts come from `.claude/context/learning.md`. A new value goes into
+  `templates/context/learning.md` too, under one of its existing headings. Projects copy those
+  headings, so don't rename them.
 
 ## Test a change before releasing
 

@@ -1,6 +1,7 @@
 # Using ai-common
 
 Two separate installs: the **guards** once per machine, the **workflow** once per project.
+A learning repo can also add the opt-in **learning** package (see "Add the learning package").
 
 ## 0. Prerequisites
 
@@ -128,11 +129,29 @@ fill them in:
 | `templates/context/pr-checklist.md` → `.claude/context/pr-checklist.md` | `create-pr`, `triage-dependabot` |
 | `templates/context/docs.md` → `.claude/context/docs.md` | `update-documentation` |
 | `templates/context/audit.md` → `.claude/context/audit.md` | `repo-audit` |
+| `templates/context/learning.md` → `.claude/context/learning.md` | every `learning` skill and the `socratic-reviewer` agent (only if the learning package is installed) |
 
 `setup-project` needs no context file: it follows the project's setup runbook (the router's
 setup row, or `documentation/Setup.md`).
 
 For a new project, also start from `templates/CLAUDE.md` and `templates/settings.project.json`.
+
+## Add the learning package (opt-in, project scope)
+
+For a learning repo only. The skills tutor Socratically and never write code for the learner
+(`packages/learning/README.md`). APM installs only what the project's own `apm.yml` lists, so
+projects that list only `workflow` (lineup, for example) never get these skills.
+
+```bash
+apm install LasterBergamot/ai-common/packages/workflow#<tag>   # the learning skills draft issues with new-issue
+apm install LasterBergamot/ai-common/packages/learning#<tag>
+```
+
+The skills deploy to `.claude/skills/` and the `socratic-reviewer` agent to `.claude/agents/`.
+Commit them as in step 2. Then copy `templates/context/learning.md` to
+`.claude/context/learning.md` and fill it in: paths, tutor tone, tracks, platforms, formats and
+visualization markers. The package supplies only the skills. Enforce the no-code rule in the
+project as well, with `permissions.deny` rules on the labs folder and a Socratic output style.
 
 ## 4. Check it works
 
