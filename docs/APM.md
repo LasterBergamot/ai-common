@@ -16,8 +16,8 @@ hashes (drift) and scans for hidden Unicode in the deployed content.
    machine. APM installs a sub-folder of a repo as a package
    (`LasterBergamot/ai-common/packages/<name>#<tag>`).
 2. **Deployed files are committed in the project** (`.claude/skills/`, `.claude/agents/`), and
-   `apm_modules/` is ignored. Without that, every contributor and CI would need access to
-   this private repo just to have the skills.
+   `apm_modules/` is ignored. Without that, every contributor and CI would need APM and a
+   fetch of this repo just to have the skills.
 3. **Pinned by tag**, never a branch. The lock file holds the exact commit.
 4. **Generic skills read project context files** (`.claude/context/*.md`). That is how one
    skill serves several projects, and why the project-specific skills (for example lineup's
@@ -30,8 +30,7 @@ hashes (drift) and scans for hidden Unicode in the deployed content.
    parse Claude Code's payload. If that changes: other targets deploy skills to
    `.agents/skills/` as plain instructions and ignore the Claude-only keys; the hooks would
    need a payload adapter.
-7. **CI does not run `apm audit` yet**: it would need a token for this private repo. Run it
-   locally before committing an update.
+7. **CI does not run `apm audit` yet.** Run it locally before committing an update.
 
 ## Known limits
 
