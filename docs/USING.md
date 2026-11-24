@@ -1,15 +1,17 @@
 # Using ai-common
 
 Two separate installs: the **guards** once per machine, the **workflow** once per project.
+A learning repo can also add the opt-in **learning** package (see "Add the learning package").
 
 ## 0. Prerequisites
 
 - APM CLI: `curl -sSL https://aka.ms/apm-unix | sh` (Linux/macOS), then `apm --version`.
-- Access to this private repo. APM uses a token in `GITHUB_APM_PAT`, or your `gh` login if
-  it can read it. Check with `apm auth github.com --check`. If it reports "no credential found"
-  although `gh auth status` is fine (the token is in the system keyring), pass the `gh` token
-  for the one command: `GITHUB_APM_PAT=$(gh auth token) apm install …`. A failed auth shows up
-  as "all probes failed", which looks like a wrong path or tag.
+- Read access to this repo. It is public, so no token is needed for it. If there is one, APM
+  uses a token in `GITHUB_APM_PAT`, or your `gh` login if it can read it. Check with
+  `apm auth github.com --check`. If it reports "no credential found" although `gh auth status`
+  is fine (the token is in the system keyring), pass the `gh` token for the one command:
+  `GITHUB_APM_PAT=$(gh auth token) apm install …`. A failed auth shows up as "all probes
+  failed", which looks like a wrong path or tag.
 - `bash` and `jq` on `PATH` (the guard scripts need both; on Windows, Git Bash).
 
 ## 1. Install the guards on a machine (user scope)
@@ -101,7 +103,7 @@ From the project root:
 
 ```bash
 apm init -y --target claude          # only if the project has no apm.yml yet
-apm install LasterBergamot/ai-common/packages/workflow#v0.1.0
+apm install LasterBergamot/ai-common/packages/workflow#v0.2.0
 ```
 
 This adds the dependency to `apm.yml`, writes `apm.lock.yaml`, adds `apm_modules/` to
@@ -111,7 +113,7 @@ This adds the dependency to `apm.yml`, writes `apm.lock.yaml`, adds `apm_modules
 
 **Commit** `apm.yml`, `apm.lock.yaml` and the deployed `.claude/skills/` and
 `.claude/agents/` files. Committing them means anyone who clones the project gets the skills
-without access to this private repo, and CI doesn't need a token. `apm_modules/` and
+without installing APM, and CI doesn't need to fetch this repo. `apm_modules/` and
 `.apm-local/` stay ignored.
 
 If the project already has a skill with the same name (an older, project-specific copy),
@@ -128,11 +130,30 @@ fill them in:
 | `templates/context/pr-checklist.md` → `.claude/context/pr-checklist.md` | `create-pr`, `triage-dependabot` |
 | `templates/context/docs.md` → `.claude/context/docs.md` | `update-documentation` |
 | `templates/context/audit.md` → `.claude/context/audit.md` | `repo-audit` |
+| `templates/context/learning.md` → `.claude/context/learning.md` | every `learning` skill and the `socratic-reviewer` agent (only if the learning package is installed) |
 
 `setup-project` needs no context file: it follows the project's setup runbook (the router's
 setup row, or `documentation/Setup.md`).
 
 For a new project, also start from `templates/CLAUDE.md` and `templates/settings.project.json`.
+
+## Add the learning package (opt-in, project scope)
+
+For a learning repo only. The skills tutor Socratically and never write code for the learner
+(`packages/learning/README.md`). APM installs only what the project's own `apm.yml` lists, so
+projects that list only `workflow` (lineup, for example) never get these skills.
+
+```bash
+apm install LasterBergamot/ai-common/packages/workflow#<tag>   # the learning skills draft issues with new-issue
+apm install LasterBergamot/ai-common/packages/learning#<tag>
+```
+
+The skills deploy to `.claude/skills/` and the `socratic-reviewer` agent to `.claude/agents/`.
+Commit them as in step 2. Then copy `templates/context/learning.md` to
+`.claude/context/learning.md` and fill it in: paths, tutor tone, tracks, platforms, formats,
+the Status values and the visualization markers. The package supplies only the skills. Enforce
+the no-code rule in the project as well, with `permissions.deny` rules on the labs folder and a
+Socratic output style.
 
 ## 4. Check it works
 
