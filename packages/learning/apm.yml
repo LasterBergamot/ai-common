@@ -1,8 +1,11 @@
 name: learning
-version: 0.1.0
+version: 0.2.0
 description: Socratic learning skills (tutor, lab planning, assessment prep, session logs, spaced review, roadmap sync) and a socratic-reviewer agent.
 targets:
   - claude
+  - agent-skills
+  - gemini
+  - codex
 dependencies:
   apm: []
   mcp: []

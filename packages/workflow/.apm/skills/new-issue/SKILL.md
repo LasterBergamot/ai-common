@@ -4,9 +4,11 @@ description: Create or update a GitHub issue following the project's issue conve
 model: haiku
 ---
 
+Context files: `<context>` below means `.agents/context/` in the project, or `.claude/context/` if that folder doesn't exist.
+
 Every issue in the project carries the same metadata, so the board and milestones stay
 trustworthy. The project's own values (repo, labels, milestones, epics, board) live in
-**`.claude/context/issues.md`**. Read it first; this skill only holds the procedure. If the
+**`<context>/issues.md`**. Read it first; this skill only holds the procedure. If the
 file is missing, ask the user for the repo and labels instead of guessing, and offer to create
 the file from `ai-common`'s template.
 

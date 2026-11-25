@@ -102,16 +102,22 @@ From the project root:
 
 ```bash
 apm init -y --target claude          # only if the project has no apm.yml yet
-apm install LasterBergamot/ai-common/packages/workflow#v0.1.0
+apm install LasterBergamot/ai-common/packages/workflow#v0.3.0
 ```
 
 This adds the dependency to `apm.yml`, writes `apm.lock.yaml`, adds `apm_modules/` to
-`.gitignore`, and deploys:
-- the skills to `.claude/skills/<name>/SKILL.md`,
-- the agent to `.claude/agents/convention-reviewer.md`.
+`.gitignore`, and deploys for each target in the project's `apm.yml` `targets:`:
+- `claude`: the skills to `.claude/skills/<name>/SKILL.md`, the agent to
+  `.claude/agents/convention-reviewer.md`;
+- `agent-skills` (and `gemini`, `codex`): the skills to `.agents/skills/<name>/SKILL.md`;
+  `codex` also gets the agent as `.codex/agents/<name>.toml`.
 
-**Commit** `apm.yml`, `apm.lock.yaml` and the deployed `.claude/skills/` and
-`.claude/agents/` files. Committing them means anyone who clones the project gets the skills
+To serve more than one AI tool, list the targets in the project's `apm.yml`, for example
+`targets: [claude, agent-skills]`, and run `apm install`. What each target gets, and what is
+Claude-only, is in `docs/APM.md`, "Multiple AI tools".
+
+**Commit** `apm.yml`, `apm.lock.yaml` and the deployed files (`.claude/skills/`,
+`.claude/agents/`, `.agents/skills/`, …). Committing them means anyone who clones the project gets the skills
 without access to this private repo, and CI doesn't need a token. `apm_modules/` and
 `.apm-local/` stay ignored.
 
@@ -120,21 +126,26 @@ delete it first; APM refuses to overwrite a file it didn't write.
 
 ## 3. Write the project's context files
 
-The workflow skills read the project's values from `.claude/context/`. Copy the templates and
-fill them in:
+The workflow skills read the project's values from `.agents/context/`, or from
+`.claude/context/` if the project has no `.agents/context/` folder (older projects such as
+lineup keep working unchanged). New projects use `.agents/context/`, which every AI tool can
+read. Copy the templates and fill them in:
 
 | File | Read by |
 |------|---------|
-| `templates/context/issues.md` → `.claude/context/issues.md` | `new-issue` |
-| `templates/context/pr-checklist.md` → `.claude/context/pr-checklist.md` | `create-pr`, `triage-dependabot` |
-| `templates/context/docs.md` → `.claude/context/docs.md` | `update-documentation` |
-| `templates/context/audit.md` → `.claude/context/audit.md` | `repo-audit` |
-| `templates/context/learning.md` → `.claude/context/learning.md` | every `learning` skill and the `socratic-reviewer` agent (only if the learning package is installed) |
+| `templates/context/issues.md` → `.agents/context/issues.md` | `new-issue` |
+| `templates/context/pr-checklist.md` → `.agents/context/pr-checklist.md` | `create-pr`, `triage-dependabot` |
+| `templates/context/docs.md` → `.agents/context/docs.md` | `update-documentation` |
+| `templates/context/audit.md` → `.agents/context/audit.md` | `repo-audit` |
+| `templates/context/learning.md` → `.agents/context/learning.md` | every `learning` skill and the `socratic-reviewer` agent (only if the learning package is installed) |
 
 `setup-project` needs no context file: it follows the project's setup runbook (the router's
 setup row, or `documentation/Setup.md`).
 
-For a new project, also start from `templates/CLAUDE.md` and `templates/settings.project.json`.
+For a new project, also start from `templates/AGENTS.md` (the router every tool reads),
+`templates/CLAUDE.md` (a stub importing it) and `templates/settings.project.json`. For Gemini
+CLI, `apm compile --target gemini` creates a `GEMINI.md` that imports `AGENTS.md`; it never
+overwrites a handwritten `AGENTS.md` or `CLAUDE.md`.
 
 ## Add the learning package (opt-in, project scope)
 
@@ -147,24 +158,26 @@ apm install LasterBergamot/ai-common/packages/workflow#<tag>   # the learning sk
 apm install LasterBergamot/ai-common/packages/learning#<tag>
 ```
 
-The skills deploy to `.claude/skills/` and the `socratic-reviewer` agent to `.claude/agents/`.
-Commit them as in step 2. Then copy `templates/context/learning.md` to
-`.claude/context/learning.md` and fill it in: paths, tutor tone, tracks, platforms, formats and
-visualization markers. The package supplies only the skills. Enforce the no-code rule in the
-project as well, with `permissions.deny` rules on the labs folder and a Socratic output style.
+The skills deploy per target as in step 2 (`.claude/skills/`, `.agents/skills/`), and the
+`socratic-reviewer` agent to `.claude/agents/` (and `.codex/agents/` for `codex`). Commit them
+as in step 2. Then copy `templates/context/learning.md` to `.agents/context/learning.md` and
+fill it in: paths, tutor tone, tracks, platforms, formats, the Status values and the
+visualization markers. The package supplies only the skills. Put the no-code rule in the
+project's `AGENTS.md` so every tool follows it. For Claude Code, enforce it harder with
+`permissions.deny` rules on the labs folder and a Socratic output style.
 
 ## 4. Check it works
 
 - `apm audit` in the project: no drift, no hidden-Unicode findings.
 - In Claude Code, `/` lists the skills. Ask for `new-issue` and check that it reads
-  `.claude/context/issues.md`.
+  `issues.md` from the project's context folder.
 
 ## Updating a project to a new ai-common version
 
 ```bash
-# change the tag in apm.yml (e.g. #v0.1.0 -> #v0.2.0), then:
+# change the tag in apm.yml (e.g. #v0.2.0 -> #v0.3.0), then:
 apm install
-git diff .claude/   # review what changed in the deployed skills
+git diff .claude/ .agents/   # review what changed in the deployed skills
 ```
 
 Commit `apm.yml`, `apm.lock.yaml` and the changed deployed files together.

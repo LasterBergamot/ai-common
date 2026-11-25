@@ -1,28 +1,16 @@
-# <Project name> — Claude Code context
+# <Project name>: Claude Code context
 
-This file is a router. It holds only what every session needs. Detail lives in
-`.claude/rules/` (loads when a matching file is touched) and `.claude/context/` (read when the
-table says so).
+@AGENTS.md
 
-## What this is
+`AGENTS.md` (imported above) is the router and rule set for every AI tool. This file adds only
+what is specific to Claude Code.
 
-<One paragraph: what the project does, how it runs, what not to do.>
+## Claude-only extras
 
-## Router: working on X → read Y
-
-| Working on | Read |
-|------------|------|
-| Setting up a dev machine | `documentation/Setup.md` (the `setup-project` skill follows it) |
-| <area> | `.claude/rules/<file>.md` |
-| Workflow, branches, merge rules | `.claude/context/workflow.md` |
-| Filing or editing issues | `.claude/context/issues.md` |
-| Opening a PR, Dependabot | `.claude/context/pr-checklist.md` |
-| Docs and where they live | `.claude/context/docs.md` |
-
-## Always-on rules
-
-- <Rules that apply to every change, for example "every change updates the README".>
-- State-changing git or gh commands need explicit confirmation (also enforced by
-  `permissions.ask` and the `ai-common` guard hooks).
-- The skills listed in `apm.yml`'s lock come from `ai-common`: change them there, not in
-  `.claude/skills/`, then bump the tag in `apm.yml` and run `apm install`.
+- **Settings:** `.claude/settings.json` (from `ai-common`'s `templates/settings.project.json`)
+  asks before state-changing git and gh commands (`permissions.ask`) and holds any
+  `permissions.deny` rules. The guard hooks from `ai-common` (user scope) add another layer.
+- **Path rules:** `.claude/rules/<file>.md` loads when a matching file is touched.
+- **Skills and agents:** `model:` and `effort:` in their frontmatter are honoured by Claude Code
+  only.
+- Sub-agents load neither this file nor the rules: put the paths they need in their prompt.
