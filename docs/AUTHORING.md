@@ -38,16 +38,17 @@
 
    ```bash
    mkdir -p /tmp/apm-try && cd /tmp/apm-try && mkdir -p .claude
-   printf 'name: try\nversion: 0.0.0\ntargets: [claude]\ndependencies:\n  apm:\n    - %s\n' \
-     "$HOME/Work/repos/ai-common/packages/workflow" > apm.yml
-   apm install
+   printf 'name: try\nversion: 0.0.0\ntargets: [claude]\ndependencies:\n  apm:\n    - %s\n    - %s\n' \
+     "$HOME/Work/repos/personal/ai-common/packages/workflow" \
+     "$HOME/Work/repos/personal/ai-common/packages/learning" > apm.yml
+   apm install && apm audit
    ```
 
 2. For the guards, install under a throw-away home so your real settings are untouched:
 
    ```bash
    mkdir -p /tmp/fakehome/.claude && echo '{}' > /tmp/fakehome/.claude/settings.json
-   HOME=/tmp/fakehome apm install -g "$HOME/Work/repos/ai-common/packages/guards" --target claude
+   HOME=/tmp/fakehome apm install -g "$HOME/Work/repos/personal/ai-common/packages/guards" --target claude
    ```
 
    And run `bash packages/guards/scripts/test-hooks.sh`, then the same with

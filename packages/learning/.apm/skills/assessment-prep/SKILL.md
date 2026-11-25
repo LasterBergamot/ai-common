@@ -46,6 +46,7 @@ assessment's Markdown files.
 - Facts that depend on a vendor or a version (API parameter names, defaults, limits, which
   model supports what) are not yours to assert. Ask the learner to look them up in the vendor's
   current docs, and discuss what they find.
+- Keep a list of every online source used (yours and the learner's).
 - Move on when the learner can explain it back in their own words.
 
 ## 3. Mock evaluation
@@ -65,9 +66,14 @@ assessment's Markdown files.
   format from the context file.
 - Add recall questions for the weak spots to the review queue (the `session-log` format).
 - Tell the learner: what is ready, what still has gaps, and which level-in-scope gaps to tackle
-  next. Mention that `roadmap-sync` refreshes the wiki heatmap.
+  next. Mention that `roadmap-sync` refreshes the readiness heatmap.
+- Add every online source used to the **References** section of the subject's references file
+  (from the context file; default `<assessments root>/<subject>/README.md`), with a one-line
+  note on what it covers. Don't duplicate an entry.
+- Propose a checkpoint commit and push of the subject folder, as `session-log` describes, and
+  run it only after the learner's explicit go-ahead.
 
 ## Never
 
 - Never mark a competency `ready` without a met mock answer.
-- Never run state-changing git or gh commands.
+- Never run state-changing git or gh commands without an explicit go-ahead.

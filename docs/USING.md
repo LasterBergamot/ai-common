@@ -102,7 +102,7 @@ From the project root:
 
 ```bash
 apm init -y --target claude          # only if the project has no apm.yml yet
-apm install LasterBergamot/ai-common/packages/workflow#v0.1.0
+apm install LasterBergamot/ai-common/packages/workflow#v0.3.0
 ```
 
 This adds the dependency to `apm.yml`, writes `apm.lock.yaml`, adds `apm_modules/` to
@@ -149,9 +149,9 @@ apm install LasterBergamot/ai-common/packages/learning#<tag>
 
 The skills deploy to `.claude/skills/` and the `socratic-reviewer` agent to `.claude/agents/`.
 Commit them as in step 2. Then copy `templates/context/learning.md` to
-`.claude/context/learning.md` and fill it in: paths, tutor tone, tracks, platforms, formats and
-visualization markers. The package supplies only the skills. Enforce the no-code rule in the
-project as well, with `permissions.deny` rules on the labs folder and a Socratic output style.
+`.claude/context/learning.md` and fill it in: paths, tutor tone, tracks, platforms, formats,
+the Status values and the visualization markers. The package supplies only the skills. Enforce
+the no-code rule in the project as well, with `permissions.deny` rules on the labs folder and a Socratic output style.
 
 ## 4. Check it works
 
@@ -162,7 +162,7 @@ project as well, with `permissions.deny` rules on the labs folder and a Socratic
 ## Updating a project to a new ai-common version
 
 ```bash
-# change the tag in apm.yml (e.g. #v0.1.0 -> #v0.2.0), then:
+# change the tag in apm.yml (e.g. #v0.2.0 -> #v0.3.0), then:
 apm install
 git diff .claude/   # review what changed in the deployed skills
 ```
