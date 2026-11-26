@@ -30,6 +30,7 @@ Every primitive declares `model:` and `effort:` (see `docs/AUTHORING.md`).
 
 | Primitive | Purpose | model | effort |
 |---|---|---|---|
+| `learn` | The entry point, started at the repo root: where you stand (status command), recommendations (repo, a short learning-only interview, the web), then `cd` into the lab and hand over to the skill below that fits | opus | medium |
 | `socratic-tutor` | A learning session: prerequisite check on pick-up, probe, question, hint ladder, explain-back, summary and sources | opus | high |
 | `plan-lab` | Topic → prerequisite check → lab brief with Status line and References → node in the track graph → optional issue drafts | opus | high |
 | `prereq-check` | Before a track or lab: repo prerequisites and their Status, then web sources; reports "ready" or gaps; never blocks | opus | high |

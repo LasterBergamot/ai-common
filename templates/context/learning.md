@@ -1,6 +1,6 @@
 # Learning conventions
 
-Read by the `learning` package's skills (`socratic-tutor`, `plan-lab`, `prereq-check`,
+Read by the `learning` package's skills (`learn`, `socratic-tutor`, `plan-lab`, `prereq-check`,
 `assessment-prep`, `import-matrix`, `session-log`, `review-quiz`, `roadmap-sync`) and the
 `socratic-reviewer` agent. The skills hold the procedure; this file holds the values. It lives
 in `.claude/context/learning.md`.
@@ -18,6 +18,9 @@ in `.claude/context/learning.md`.
 - **Review queue:** `<docs/Review-Queue.md>`
 - **Assessments heatmap page:** `<docs/Assessments.md>`
 - **Glossary:** `<docs/Glossary.md>`
+- **Status command:** `<python3 scripts/lab-status.py>` (read-only; prints the labs in
+  progress with where the learner stopped and the next step, due reviews, assessment
+  readiness, labs ready to start). Optional: without one, `learn` reads the files itself.
 
 ## Tutor
 
@@ -30,6 +33,12 @@ in `.claude/context/learning.md`.
   a short example to critique in assessment prep; …>
 - **Picking up a track or lab:** run `prereq-check` first (repo, then web). It advises; the
   learner decides.
+- **Entry point:** `learn`, started at the repo root. It shows where the learner stands,
+  recommends, hands over to the other skills and moves the shell into the chosen lab folder.
+- **Recommendations:** at most <5>, each with its reason (graph, a done lab it builds on, an
+  assessment gap, an open question, a web source) and its cost (tier, RAM, disk).
+- **Interview:** <only about learning: what to understand or build, how deep, how much time.
+  Asked in the session, never stored.>
 - **Sources:** every online source used for a topic, track or lab goes into the **References**
   section of the relevant README (lab README, track README, or the subject references file).
 
@@ -61,10 +70,13 @@ below 1024, relative bind mounts, LF line endings, …>
 
 ## Session logs
 
-- **Lab sessions:** appended to the lab's `<NOTES.md>` under `## YYYY-MM-DD: <goal>`
+- **Lab sessions:** appended (newest last) to the lab's `<NOTES.md>` under
+  `## Session YYYY-MM-DD: <goal>`
 - **Assessment sessions:** `<assessments/>/<subject>/sessions/YYYY-MM-DD-<level>.md`
-- **Format:** Goal · What I can now explain (in my words) · What I built or changed (prose and
-  links) · Misconceptions fixed · Still unclear · Next step
+- **Format:** one `- **Label:** text` bullet per field, these labels, this order:
+  `Goal` · `What I can now explain` (in my words) · `What I built or changed` (prose and
+  links) · `Misconceptions fixed` · `Still open` · `Where I stopped` · `Next step`. The last two
+  are never left out while a lab is in progress; the status command and `learn` read them.
 - **Checkpoint commit:** at the end of a session, propose `git add` of the lab or subject
   folder, a commit `<<track>/<lab>: <what was done>>` and a push. Only after an explicit
   go-ahead.
@@ -82,6 +94,9 @@ below 1024, relative bind mounts, LF line endings, …>
   building; explained back → done). A planned lab with no folder yet counts as `todo`.
 - **Track status:** <done when all labs are done; building when any is building; learning when
   any is learning; otherwise todo>
+- **Node ids:** <a track node's id is the track id; a lab node's id is the lab id with `-`
+  replaced by `_` (lab `ml-math` → node `ml_math`)>. The skills match a node to its lab by
+  this rule, never by position.
 - **Mermaid classDef names:** `todo`, `learning`, `building`, `done`, with colours
   <`todo fill:#eee`, `learning fill:#fde68a`, `building fill:#93c5fd`, `done fill:#86efac`>
 - **Generated-block markers:** `<!-- roadmap-sync:start -->` … `<!-- roadmap-sync:end -->`.

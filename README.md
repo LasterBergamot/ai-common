@@ -14,7 +14,7 @@ stay in each machine's `~/.claude/hooks/local.sh`, which is never committed.
 | Package | Scope | What it installs | Install |
 |---------|-------|------------------|---------|
 | [`packages/workflow`](packages/workflow) | per project | Skills: `new-issue`, `create-pr`, `triage-dependabot`, `update-documentation`, `repo-audit`, `setup-project`. Agent: `convention-reviewer`. | In the project's `apm.yml` (see [docs/USING.md](docs/USING.md)) |
-| [`packages/learning`](packages/learning) | per project, opt-in | Skills: `socratic-tutor`, `plan-lab`, `prereq-check`, `assessment-prep`, `import-matrix`, `session-log`, `review-quiz`, `roadmap-sync`. Agent: `socratic-reviewer`. Only for learning repos; no code is written for the learner. | `apm install LasterBergamot/ai-common/packages/learning#<tag>` (see [docs/USING.md](docs/USING.md)) |
+| [`packages/learning`](packages/learning) | per project, opt-in | Skills: `learn`, `socratic-tutor`, `plan-lab`, `prereq-check`, `assessment-prep`, `import-matrix`, `session-log`, `review-quiz`, `roadmap-sync`. Agent: `socratic-reviewer`. Only for learning repos; no code is written for the learner. | `apm install LasterBergamot/ai-common/packages/learning#<tag>` (see [docs/USING.md](docs/USING.md)) |
 | [`packages/guards`](packages/guards) | per machine (user) | Claude Code hooks: ask before commits/pushes, deletes, secret reads, network uploads and writes outside the workspace; audit log; backups; syntax check after edits. | `apm install -g LasterBergamot/ai-common/packages/guards#<tag>` |
 
 The workflow skills are **generic**: each one reads the project's values (repo, labels,
